@@ -1,6 +1,7 @@
 import "./css/index.css";
 import IMask from 'imask';
 
+//card type
 const ccBgColor01 = document.querySelector(".cc-bg svg > g g:nth-child(1) path");
 const ccBgColor02 = document.querySelector(".cc-bg svg > g g:nth-child(2) path");
 const ccIcon = document.querySelector(".cc-logo span:nth-child(2) img");
@@ -24,12 +25,18 @@ function setCardType(type) {
 
 globalThis.setCardType;
 
-const cvc = document.querySelector("#security-code");
-const cvcPattern = {
-    mask: "0000"
+//security code
+const securityCode = document.querySelector("#security-code");
+const securityCodePattern = {
+    mask: "000"
 };
-const cvcPatternMasked = IMask(cvc, cvcPattern);
+const securityCodePatternMasked = IMask(securityCode, securityCodePattern);
+securityCodePatternMasked.on("accept", () => {
+    const ccSecurity = document.querySelector(".cc-security .value");
+    ccSecurity.innerText = securityCode.value.length === 0 ? "000" :  securityCode.value;
+});
 
+//expiration date
 const expirationDate = document.querySelector("#expiration-date");
 const expirationDatePattern = {
     mask: "MM{/}YY",
@@ -48,19 +55,24 @@ const expirationDatePattern = {
     }
 };
 const expirationDateMasked = IMask(expirationDate, expirationDatePattern);
+expirationDateMasked.on("accept", () => {
+    const ccExpirationDate = document.querySelector(".cc-expiration .value");
+    ccExpirationDate.innerText = expirationDate.value.length === 0 ? "MM/YY" : expirationDate.value;
+})
 
+//card number
 const cardNumber = document.querySelector("#card-number");
 const cardNumberPattern = {
     mask: [
         {
             mask: "0000 0000 0000 0000",
             regex: /^4\d{0,15}/,
-            cardtype: "mastercard",
+            cardtype: "visa",
         },
         {
             mask: "0000 0000 0000 0000",
             regex: /(^5[1-5]\d{0,2}|^22[2-9]\d{0,1}|^2[3-7]\d{0,2})\d{0,12}/,
-            cardtype: "visa",
+            cardtype: "mastercard",
         },
         {
             mask: "0000 0000 0000 0000",
@@ -77,3 +89,25 @@ const cardNumberPattern = {
     }
 };
 const cardNumberMasked = IMask(cardNumber, cardNumberPattern);
+cardNumberMasked.on("accept", () => {
+    setCardType(cardNumberMasked.masked.currentMask.cardtype);
+    const ccNumber = document.querySelector(".cc-number");
+    ccNumber.innerText = cardNumber.value.length === 0 ? "0000 0000 0000 0000" : cardNumber.value;
+})
+
+//card name
+const cardHolder = document.querySelector("#card-holder");
+cardHolder.addEventListener("input", () => {
+    const ccHolder = document.querySelector(".cc-holder .value");
+    ccHolder.innerText = cardHolder.value.length === 0 ? "NOME NO CARTÃO" :  cardHolder.value;
+});
+
+//add card
+const addButton = document.querySelector("#add-card");
+addButton.addEventListener("click", () => {
+    alert("Cartão adicionado!!")  
+});
+
+document.querySelector("from").addEventListener("submit", (event) => {
+    event.preventDefault();
+});
